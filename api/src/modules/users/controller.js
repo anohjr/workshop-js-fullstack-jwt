@@ -1,5 +1,6 @@
 const { getAll, insertUser, getByEmail, addTrackToFav } = require("./model");
 const argon = require("argon2");
+const jwt = require("jsonwebtoken");
 
 const findAll = async (req, res, next) => {
     try {
@@ -35,4 +36,25 @@ const createFavTrack = async (req, res, next) => {
     }
 }
 
-module.exports = { findAll, createUser, createFavTrack };
+const login = async (req, res , next) => {
+    const {email, password} = req.body;
+    if (!email || !password) return res.status(400).json("Please specify both email and password");
+
+    try {
+        const [user] = await getByEmail(email);
+        if (!user) return res.status(400).json("Invalid email");
+
+        if (await argon.verify(user.password, password)) {
+            const token = jwt.sign({id: user.id, role: user.role}, process.env.JWT_AUTH_SECRET, {expiresIn: "1h"});
+            res.cookie("access_token", token, {httpOnly: true, secure: process.env.NODE_ENV == "production"});
+            res.status(200).json({email, id: user.id, role: user.role});
+        } 
+        else
+            res.status(400).json("invalid password");
+    } catch (error) {
+        next(error);
+    }
+
+}
+
+module.exports = { findAll, createUser, createFavTrack, login };

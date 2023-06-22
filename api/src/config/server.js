@@ -11,7 +11,7 @@ const apiRouter = require("../modules");
 const app = express();
 
 // apply global middlewares (!important: before any routes !)
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(helmet());
 app.use(express.json());
 
