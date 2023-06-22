@@ -3,6 +3,8 @@ const express = require("express");
 const cors = require('cors');
 const helmet = require('helmet');
 const errorHandler = require("../middlewares/errorHandler");
+const cookieParser = require("cookie-parser");
+
 
 // import router
 const apiRouter = require("../modules");
@@ -14,6 +16,7 @@ const app = express();
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(helmet());
 app.use(express.json());
+app.use(cookieParser());
 
 // link router to your app
 app.use(apiRouter);

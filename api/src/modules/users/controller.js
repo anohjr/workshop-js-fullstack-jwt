@@ -3,6 +3,7 @@ const argon = require("argon2");
 const jwt = require("jsonwebtoken");
 
 const findAll = async (req, res, next) => {
+    console.log(req.idUser, req.roleUser);
     try {
         const users = await getAll();
         res.status(200).json(users);
@@ -28,8 +29,8 @@ const createUser = async (req, res, next) => {
 
 const createFavTrack = async (req, res, next) => {
     try {
-        const {id, idTrack} = req.params;
-        await addTrackToFav(id, idTrack);
+        const {idTrack} = req.params;
+        await addTrackToFav(req.idUser, idTrack);
         res.sendStatus(201);
     } catch (err) {
         next(err);

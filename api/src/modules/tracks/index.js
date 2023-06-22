@@ -1,13 +1,14 @@
 const router = require('express').Router();
-const tracks = require('./controller');
+const {getAll, getOne, postTracks, updateTracks, deleteTracks} = require('./controller');
 const trackSchema = require("./validator");
 
 const validate = require("../../middlewares/validator");
+const {authorize} = require("../../middlewares/auth");
 
-router.get('/', tracks.getAll);
-router.get('/:id', tracks.getOne);
-router.post('/', validate(trackSchema), tracks.postTracks);
-router.put('/:id', tracks.updateTracks);
-router.delete('/:id', tracks.deleteTracks);
+router.get('/', getAll);
+router.get('/:id', getOne);
+router.post('/', validate(trackSchema), postTracks);
+router.put('/:id', authorize, updateTracks);
+router.delete('/:id', authorize, deleteTracks);
 
 module.exports = router;
