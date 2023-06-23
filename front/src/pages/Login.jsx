@@ -2,6 +2,7 @@ import { useState } from "react";
 import Input from "../components/Input";
 import { login } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import useStore from "../store";
 
 function Login() {
 
@@ -10,13 +11,16 @@ function Login() {
     const [error, setError] = useState(null);
 
     const navigate = useNavigate();
+
+    const {auth, setAuth} = useStore();
     
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(email, password);
-            navigate("/")
+            const result = await login(email, password);
+            setAuth({user: result.data, isLogged: true});
+            navigate("/");
         } catch (error) {
             if (error.response.status == 400)
                 setError("email ou mot de passe incorrect");

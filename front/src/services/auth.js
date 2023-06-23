@@ -4,4 +4,8 @@ const login = (email, password) => {
     return api.post("/users/login", {email, password});
 }
 
-export {login};
+const logout = () => {
+    return api.get("/users/logout");
+}
+
+export {login, logout};

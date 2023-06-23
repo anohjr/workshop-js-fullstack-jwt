@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import {getAllUsers} from "../services/users";
 // import userService from "../services/users";
-import { Navigate, useNavigate } from "react-router-dom";
 
 
 function Users() {
     const [users, setUsers] = useState([]);
-    const navigate = useNavigate();
 
     useEffect(() => {
         
@@ -16,12 +14,11 @@ function Users() {
                 setUsers(result.data);
             } catch (error) {
                 const {response} = error;
-                if (response.status == 401 || response.status == 403)
-                    navigate("/login");
+                console.error(error);
             }
         })();
 
-    }, []);
+    });
 
     // const getAllUsers = async () => {
     //     try {

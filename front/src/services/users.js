@@ -4,4 +4,8 @@ const getAllUsers = () => {
     return api.get("/users");
 }
 
-export {getAllUsers};
+const getCurrentUser = () => {
+    return api.get("/users/me");
+}
+
+export {getAllUsers, getCurrentUser};

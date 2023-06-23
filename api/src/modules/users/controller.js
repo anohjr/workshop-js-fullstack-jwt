@@ -1,4 +1,4 @@
-const { getAll, insertUser, getByEmail, addTrackToFav } = require("./model");
+const { getAll, getById, insertUser, getByEmail, addTrackToFav } = require("./model");
 const argon = require("argon2");
 const jwt = require("jsonwebtoken");
 
@@ -9,6 +9,15 @@ const findAll = async (req, res, next) => {
         res.status(200).json(users);
     } catch (err) {
         next(err)
+    }
+}
+
+const getCurrentUser = async (req, res, next) => {
+    try {
+        const [user] = await getById(req.idUser);
+        res.status(200).json(user);
+    } catch (err) {
+        next(err);
     }
 }
 
@@ -52,10 +61,14 @@ const login = async (req, res , next) => {
         } 
         else
             res.status(400).json("invalid password");
-    } catch (error) {
-        next(error);
+    } catch (err) {
+        next(err);
     }
 
 }
 
-module.exports = { findAll, createUser, createFavTrack, login };
+const logout = ({res}) => {
+    res.clearCookie("access_token").sendStatus(200);
+}
+
+module.exports = { findAll, getCurrentUser, createUser, createFavTrack, login, logout };
