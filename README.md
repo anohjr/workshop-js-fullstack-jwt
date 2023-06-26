@@ -42,7 +42,7 @@ express.static(path.join(__dirname + "/../public/upload"));
 
 2. Create a file named `fileUpload.js`into your middlewares folder and import `multer` & `path` package from your node_modules
 
-3. Create a `storage` constant whose value is the return of the `diskStorage` method:
+3. Create a `storage` constant whose value is the return of the `multer.diskStorage` method:
 (the diskStorage method takes an object as a parameter which contains 2 options {destination, filename}: the destination option allows us to specify the access path to the folder in which the files will be stored and filename allows us to rename the file before store it)
   - 3.1 the option destination and filename have the value of a function structured as follows:
   ```js 
@@ -50,7 +50,7 @@ express.static(path.join(__dirname + "/../public/upload"));
   filename: (req, file, callback) => {}
   ```
   - 3.2 In the destination function: call the `callback` by first setting the `null` value and secondly setting the path to the `upload` folder, for that you can use the same logic as for express.static using the path.join method and the __dirname variable to concatenate with the folder path.
-  - 3.3 In the filename function: call the `callback` by passing it the value `null` as the first parameter and as the second parameter a string that will concatenate the call to the Date.now() method with the name of the file which you can retrieve via file.originalname
+  - 3.3 In the filename function: call the `callback` by passing it the value `null` as the first parameter and as the second parameter a string that will concatenate the call to the Date.now() method with the name of the file which you can retrieve via `file.originalname`
 
 4. Create a `fileFilter` constant which must have a function as its value structured as follows: 
 ```js
