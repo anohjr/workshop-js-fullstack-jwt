@@ -36,7 +36,7 @@ You can read the following tutorial for helping you to setting up multer middlew
 0. In your server config use the express.static middleware globally with the following options (don't forget to import the path package: (its include into nodejs no need to install it) : 
 ```js 
 express.static(path.join(__dirname + "/../public/upload"));
-``` 
+```
 
 1. Install multer dependencie with npm  !(warning : install the package into the api folder)!
 
