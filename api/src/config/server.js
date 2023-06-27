@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const errorHandler = require("../middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
 const path = require("path");
-const upload = require("../middlewares/fileUpload");
 
 
 // import router
@@ -15,7 +14,7 @@ const apiRouter = require("../modules");
 const app = express();
 
 // apply global middlewares (!important: before any routes !)
-app.use(express.static(path.join(__dirname + "/../../public/upload")));
+app.use(express.static(path.join(__dirname + "/../../public")));
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(helmet());
 app.use(express.json());
@@ -23,8 +22,6 @@ app.use(cookieParser());
 
 // link router to your app
 app.use(apiRouter);
-
-app.post("/upload", upload.single("avatar"));
 
 // global error handler middleware
 app.use(errorHandler);
