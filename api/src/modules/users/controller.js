@@ -1,4 +1,4 @@
-const { getAll, getById, insertUser, getByEmail, addTrackToFav } = require("./model");
+const { getAll, getById, insertUser, getByEmail, addTrackToFav, updateOne } = require("./model");
 const argon = require("argon2");
 const jwt = require("jsonwebtoken");
 
@@ -16,6 +16,19 @@ const getCurrentUser = async (req, res, next) => {
     try {
         const [user] = await getById(req.idUser);
         res.status(200).json(user);
+    } catch (err) {
+        next(err);
+    }
+}
+
+const updateAvatar = async (req, res, next) => {
+    try {
+        if (!req.file) return res.status(400).json("a error occured during the upload"); // si le fichier n'existe pas
+            
+        const uploadedFilePath = req.protocol + "://" + req.get("host") + "/upload/" + req.file.filename;
+
+        const result = await updateOne({avatar: uploadedFilePath}, req.idUser)
+        res.status(200).json({avatar: uploadedFilePath});
     } catch (err) {
         next(err);
     }
@@ -71,4 +84,4 @@ const logout = ({res}) => {
     res.clearCookie("access_token").sendStatus(200);
 }
 
-module.exports = { findAll, getCurrentUser, createUser, createFavTrack, login, logout };
+module.exports = { findAll, getCurrentUser, updateAvatar, createUser, createFavTrack, login, logout };

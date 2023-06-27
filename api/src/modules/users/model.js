@@ -5,6 +5,10 @@ const getAll = async () => {
     return users;
 }
 
+const updateOne = async (user, id) => {
+    return db.query("UPDATE users SET ? WHERE id = ?", [user, id])
+}
+
 const getById = async (id) => {
     const [user] = await db.query("SELECT id, username, email, role FROM users WHERE id = ?", [id]);
     return user;
@@ -28,4 +32,4 @@ const addTrackToFav = async (idUser, idTrack) => {
     return db.query("INSERT INTO user_tracks (id_user, id_track) VALUES (?,?)", [idUser, idTrack]);
 }
 
-module.exports = { getAll, getById, insertUser, getByEmail, addTrackToFav };
+module.exports = { getAll, getById, insertUser, getByEmail, addTrackToFav, updateOne };
