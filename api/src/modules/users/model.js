@@ -10,7 +10,7 @@ const updateOne = async (user, id) => {
 }
 
 const getById = async (id) => {
-    const [user] = await db.query("SELECT id, username, email, role FROM users WHERE id = ?", [id]);
+    const [user] = await db.query("SELECT id, username, email, avatar, role FROM users WHERE id = ?", [id]);
     return user;
 }
 

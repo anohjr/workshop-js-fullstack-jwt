@@ -8,4 +8,8 @@ const getCurrentUser = () => {
     return api.get("/users/me");
 }
 
-export {getAllUsers, getCurrentUser};
+const updateAvatar = (form) => {
+    return api.post("/users/updateAvatar", form);
+}
+
+export {getAllUsers, getCurrentUser, updateAvatar};
