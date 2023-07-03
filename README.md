@@ -61,8 +61,9 @@ You can read the following tutorial for helping you to setting up nodemailer :
 
 1. Create a new folder named "helpers" into the src folder and create a `mailer.js` file in it.
 
-2. Setup nodemailer transporter for email sending in `mailer.js` :
+2. Import and setup nodemailer transporter for email sending in `mailer.js` :
 ```js
+const mailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
@@ -77,12 +78,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
 
 3. Setup nodemailer and create sendMail method in `mailer.js` :
 
-  - 3.1 Import nodemailer :
-  ```js
-  const mailer = require("nodemailer");
-  ```
-
-  - 3.2 Add and export a `sendResetPasswordMail` function who takes in parameters the following object => {dest, url}
+  - 3.1 Add and export a `sendResetPasswordMail` function who takes in parameters the following object => {dest, url}
   ```js
   const transporter = ...
   ...
@@ -95,7 +91,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
   };
   ```
 
-  - 3.3 In your `sendResetPasswordMail` define the mail option with the following : 
+  - 3.2 In your `sendResetPasswordMail` define the mail option with the following : 
   ```js
   const mailOptions = {
     from: process.env.SMTP_USER, // this is the address from which the email will be sent
@@ -105,7 +101,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
     html: `<p>Use this link to reset your password : <a href=${url}>reset your password</a>`,
   };
   ```
-  - 3.4 Finally, in your `sendResetPasswordMail` use the `sendMail` method of the transporter :
+  - 3.3 Finally, in your `sendResetPasswordMail` use the `sendMail` method of the transporter :
   ```js
   return transporter.sendMail(mailOptions);
   ```
