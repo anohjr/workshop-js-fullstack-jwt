@@ -36,6 +36,7 @@ function Login() {
                 <Input type="password" value={password} setValue={setPassword} />
                 <Input type="submit" value="Se connecter" setValue="" />
             </form>
+            <button onClick={() => navigate("/forgotPassword")}>J'ai oublier mon mot de passe ?</button>
         </>
     );
 }

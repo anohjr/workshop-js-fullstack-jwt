@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Nav from "./components/Nav/Nav";
 import useStore from "./store";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Routes>
             <Route exact path='/' element={<PrivateRoute><Home /></PrivateRoute>} />
             <Route exact path='/login' element={<PublicRoute><Login /></PublicRoute>} />
+            <Route exact path='/forgotPassword' element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+            <Route exact path='/resetPassword' element={<PublicRoute><ResetPassword /></PublicRoute>} />
             <Route exact path='/users' element={<PrivateRoute role="ROLE_ADMIN"><Users /></PrivateRoute>} />
         </Routes>
       </div>

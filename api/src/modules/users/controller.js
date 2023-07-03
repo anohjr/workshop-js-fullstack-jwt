@@ -1,6 +1,7 @@
-const { getAll, getById, updateOne, insertUser, getByEmail, addTrackToFav } = require("./model");
+const { getAll, getById, updateOne, insertUser, getByEmail, addTrackToFav, updateOneByMail } = require("./model");
 const argon = require("argon2");
 const jwt = require("jsonwebtoken");
+const {sendResetPasswordMail} = require("../../helpers/mailer.js");
 
 const findAll = async (req, res, next) => {
     console.log(req.idUser, req.roleUser);
@@ -66,7 +67,7 @@ const login = async (req, res , next) => {
     try {
         const [user] = await getByEmail(email);
         if (!user) return res.status(400).json("Invalid email");
-
+        console.log(user, password);
         if (await argon.verify(user.password, password)) {
             const token = jwt.sign({id: user.id, role: user.role}, process.env.JWT_AUTH_SECRET, {expiresIn: "1h"});
             res.cookie("access_token", token, {httpOnly: true, secure: process.env.NODE_ENV == "production"});
@@ -84,4 +85,32 @@ const logout = ({res}) => {
     res.clearCookie("access_token").sendStatus(200);
 }
 
-module.exports = { findAll, getCurrentUser, updateAvatar, createUser, createFavTrack, login, logout };
+const sendResetPassword = async (req, res, next) => {
+    const { email } = req.body;
+
+    try {
+        const resetToken = jwt.sign({ email }, process.env.JWT_AUTH_SECRET);
+        const url = `${process.env.FRONTEND_URL}/resetPassword?token=${resetToken}`;
+        await sendResetPasswordMail({ dest: email, url });
+        res.sendStatus(200);
+    } catch (error) {
+        next(error);
+    }
+
+}
+
+const resetPassword = async (req, res, next) => {
+    const { token, password } = req.body;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_AUTH_SECRET);
+        const hash = await argon.hash(password);
+        await updateOneByMail({password: hash}, decoded.email);
+        res.sendStatus(204);
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+module.exports = { findAll, getCurrentUser, updateAvatar, createUser, createFavTrack, login, logout, sendResetPassword, resetPassword };

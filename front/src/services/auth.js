@@ -8,4 +8,12 @@ const logout = async () => {
     return api.get("/users/logout");
 }
 
-export {login, logout};
+const sendResetPassword = async (email) => {
+    return api.post("/users/sendResetPassword", {email});
+}
+
+const resetPassword = async (password, token) => {
+    return api.post("/users/resetPassword", {password, token});
+}
+
+export {login, logout, sendResetPassword, resetPassword};
