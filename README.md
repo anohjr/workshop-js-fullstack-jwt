@@ -1,5 +1,5 @@
 
-# Workshop file upload : Express/React Multer
+# Workshop send mail : Express/React nodemailer
 
 ### Install dependencies
 Install the dependencies project with the command:
@@ -61,8 +61,9 @@ You can read the following tutorial for helping you to setting up nodemailer :
 
 1. Create a new folder named "helpers" into the src folder and create a `mailer.js` file in it.
 
-2. Setup nodemailer transporter for email sending in `mailer.js` :
+2. Import and setup nodemailer transporter for email sending in `mailer.js` :
 ```js
+const mailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
@@ -77,12 +78,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
 
 3. Setup nodemailer and create sendMail method in `mailer.js` :
 
-  - 3.1 Import nodemailer :
-  ```js
-  const mailer = require("nodemailer");
-  ```
-
-  - 3.2 Add and export a `sendResetPasswordMail` function who takes in parameters the following object => {dest, url}
+  - 3.1 Add and export a `sendResetPasswordMail` function who takes in parameters the following object => {dest, url}
   ```js
   const transporter = ...
   ...
@@ -95,7 +91,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
   };
   ```
 
-  - 3.3 In your `sendResetPasswordMail` define the mail option with the following : 
+  - 3.2 In your `sendResetPasswordMail` define the mail option with the following : 
   ```js
   const mailOptions = {
     from: process.env.SMTP_USER, // this is the address from which the email will be sent
@@ -105,7 +101,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
     html: `<p>Use this link to reset your password : <a href=${url}>reset your password</a>`,
   };
   ```
-  - 3.4 Finally, in your `sendResetPasswordMail` use the `sendMail` method of the transporter :
+  - 3.3 Finally, in your `sendResetPasswordMail` use the `sendMail` method of the transporter :
   ```js
   return transporter.sendMail(mailOptions);
   ```
@@ -131,12 +127,12 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
 
   - 4.4 After generating the resetToken create a const `url` with the following structure :
   ```js
-  const url = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
+  const url = `${process.env.FRONTEND_URL}/resetPassword?token=${resetToken}`;
   ```
 
   - 4.5 Finally, call the `sendResetPasswordMail` passing it as a parameters the following : 
   ```js
-  await sendResetPasswordMail({email, url});
+  await sendResetPasswordMail({dest: email, url});
   ```
 
   - 4.6 If no error occured just send a response with 200 http status (dont forget to catch the error), and dont forget to export your method for link to your route in the index.js file of the users module.
@@ -171,7 +167,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
 
   - 1 Create a page component `ResetPassword` that include a form with a password input and a submit button
 
-  - 2 Get the token in the url with `useParams` hook : https://reactrouter.com/en/main/hooks/use-params
+  - 2 Get the token in the url with `useSearchParams` hook : https://reactrouter.com/en/main/hooks/use-search-params
 
   - 3 Add a handleSubmit method for calling the post route `resetPassword` with axios
 
