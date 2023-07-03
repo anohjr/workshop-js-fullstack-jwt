@@ -70,7 +70,7 @@ const login = async (req, res , next) => {
         if (await argon.verify(user.password, password)) {
             const token = jwt.sign({id: user.id, role: user.role}, process.env.JWT_AUTH_SECRET, {expiresIn: "1h"});
             res.cookie("access_token", token, {httpOnly: true, secure: process.env.NODE_ENV == "production"});
-            res.status(200).json({email, id: user.id, role: user.role});
+            res.status(200).json({email, id: user.id, role: user.role, avatar: user.avatar});
         } 
         else
             res.status(400).json("invalid password");

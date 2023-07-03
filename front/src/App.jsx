@@ -12,7 +12,7 @@ function App() {
         <Nav />
         <Routes>
             <Route exact path='/' element={<PrivateRoute><Home /></PrivateRoute>} />
-          <Route exact path='/login' element={<PublicRoute><Login /></PublicRoute>} />
+            <Route exact path='/login' element={<PublicRoute><Login /></PublicRoute>} />
             <Route exact path='/users' element={<PrivateRoute role="ROLE_ADMIN"><Users /></PrivateRoute>} />
         </Routes>
       </div>

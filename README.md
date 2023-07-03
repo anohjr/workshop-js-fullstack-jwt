@@ -28,67 +28,151 @@ npm run dev
 
 # API
 
-## 1 - Setup multer upload file middleware
-You can read the following tutorial for helping you to setting up multer middlewares : 
-[1-multer/express](https://openclassrooms.com/fr/courses/6390246-passez-au-full-stack-avec-node-js-express-et-mongodb/6466627-acceptez-les-fichiers-entrants-avec-multer)
-[2-multer/express](https://www.freecodecamp.org/news/simplify-your-file-upload-process-in-express-js/)
+## 0 - Creating an account on Sendinblue
 
-0. In your server config use the express.static middleware globally with the following options (don't forget to import the path package: (its include into nodejs no need to install it) : 
-```js 
-express.static(path.join(__dirname + "/../public/upload"));
-```
+Sendinblue is a french emailing plateform. By using it, you will be able to use their SMTP parameters to send email from your app.
 
-1. Install multer dependencie with npm  !(warning : install the package into the api folder)!
+Create an account on this website : https://app.sendinblue.com/account/profile/
 
-2. Create a file named `fileUpload.js`into your middlewares folder and import `multer` & `path` package from your node_modules
+Add all informations needed. You will receive a confirmation email to finish the account creation. (Sendingblue recommends you to use a professionnal email, but you can use a classical email like a gmail one).
 
-3. Create a `storage` constant whose value is the return of the `multer.diskStorage` method:
-(the diskStorage method takes an object as a parameter which contains 2 options {destination, filename}: the destination option allows us to specify the access path to the folder in which the files will be stored and filename allows us to rename the file before store it)
-  - 3.1 the option destination and filename have the value of a function structured as follows:
-  ```js 
-  destination : (req, file, callback) => {},
-  filename: (req, file, callback) => {}
-  ```
-  - 3.2 In the destination function: call the `callback` by first setting the `null` value and secondly setting the path to the `upload` folder, for that you can use the same logic as for express.static using the path.join method and the __dirname variable to concatenate with the folder path.
-  - 3.3 In the filename function: call the `callback` by passing it the value `null` as the first parameter and as the second parameter a string that will concatenate the call to the Date.now() method with the name of the file which you can retrieve via `file.originalname`
+On your account, navigate to `Transactionel`. You will find these informations :
 
-4. Create a `fileFilter` constant which must have a function as its value structured as follows: 
+- SMTP server
+- Port
+- id
+- SMTP key (you maybe need to generate it)
+
+## 1 - Update env file
+
+On the api folder, update your .env file and fill these informations with the credentials you get from sendingblue :
+
+- SMTP_HOST=
+- SMTP_PORT=
+- SMTP_USER=
+- SMTP_PASSWORD=
+
+## 2 - Setup nodemailer helper method
+You can read the following tutorial for helping you to setting up nodemailer : 
+[1- nodemailer](https://dev.to/documatic/send-email-in-nodejs-with-nodemailer-using-gmail-account-2gd1)
+
+0. Move to the api folder and install the nodemailer dependency:
+`npm install nodemailer`.
+
+1. Create a new folder named "helpers" into the src folder and create a `mailer.js` file in it.
+
+2. Setup nodemailer transporter for email sending in `mailer.js` :
 ```js
-(req, file, callback) => {}
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
+    },
+});
 ```
-  - 4.1 First create an array type constant that contains all file mimetypes accepted for upload in our case we only accept images, example of mimetype: "image/jpg"
-  - 4.2 Set up a condition within your fileFilter method by validating that the mimetype of the file to send corresponds to a value defined in your array (you can retrieve the mimetype of the file to send via file.mimetype)
-  - 4.3 If the mimetype of the file matches: call the callback method passing it `null` as the first parameter and `true` as the second parameter to accept the file upload
-  - 4.4 if the mimetype of the file does not match: call the callback method passing it a new Error("Only filetype image is allowed")
+NB : the secure key must be setting up to false for 587 PORT, and true for 465 PORT. By default, sendinBlue give you a 587 PORT.
 
-5. Export the call to the multer() method by passing as a parameter an object that contains 2 keys: storage & fileFilter that we have defined beforehand
+3. Setup nodemailer and create sendMail method in `mailer.js` :
 
+  - 3.1 Import nodemailer :
+  ```js
+  const mailer = require("nodemailer");
+  ```
 
-## 2 - Create a update route for users
+  - 3.2 Add and export a `sendResetPasswordMail` function who takes in parameters the following object => {dest, url}
+  ```js
+  const transporter = ...
+  ...
+  const sendResetPasswordMail = async ({dest, url}) => {
+    
+  };
 
-1. Add a new methode `updateOne` in your model for users, this method should take a object user and a id in parameters, this methode should make a query for updating the user data
+  module.exports = {
+    sendResetPasswordMail,
+  };
+  ```
 
-2. Import your `updateOne` methode in your controller and define a new method called `updateAvatar`
-  - 2.1 First of all your method must check the existence of the file and return a status 400 with an error message in case the file is missing (you can recover the file via req.file !warning! req.file will be defined via multer middleware call no need to test for now)
-  - 2.2 Create a constant `uploadedFilePath` which takes in value the access path to the file on your server, the generated value must look like this: "http://localhost:8080/upload/${filename}", for that you can use the following variables: req.protocol & req.get("host") & req.file.filename
-  - 2.3 Call your `updateOne` method defined earlier by passing it as the first parameter an object with the `avatar` key which takes the value of the `uploadedFilePath` constant, and as the second parameter the id of the user making the request via the variable req.idUser (this implies that our route is only accessible if we are connected and that therefore we apply our auth middleware to it)
-  - 2.4 If everything went well, return a status of 200 with an object with the avatar key that takes the value of the `uploadedFilePath` constant
+  - 3.3 In your `sendResetPasswordMail` define the mail option with the following : 
+  ```js
+  const mailOptions = {
+    from: process.env.SMTP_USER, // this is the address from which the email will be sent
+    to: dest, // this is the address to which the email will be sent
+    subject: "Reset your password",
+    text: `Use this link to reset your password : ${url}`, // url will be defined later in our controller
+    html: `<p>Use this link to reset your password : <a href=${url}>reset your password</a>`,
+  };
+  ```
+  - 3.4 Finally, in your `sendResetPasswordMail` use the `sendMail` method of the transporter :
+  ```js
+  return transporter.sendMail(mailOptions);
+  ```
 
-3. Create a route post /users/updateAvatar
-  - 3.1 Import the `updateAvatar` method of your controller as well as your multer middleware
-  - 3.2 Create a post route that takes "/users/updateAvatar" as an endpoint, this route must include your authentication middleware followed by the `multer.single("avatar")` middleware and your `updateAvatar` controller method
+4. Add a new post route `/sendResetPassword` in your module users :
+
+  - 4.1 import the `sendResetPasswordMail` method in your user controller :
+  ```js 
+  const sendResetPasswordMail = require("../../helpers/mailer.js");
+  ```
+
+  - 4.2 Create a `sendResetPassword` method in your controller :
+  ```js
+  const sendResetPassword = (req, res, next) => {
+    const {email} = req.body;
+  }
+  ```
+
+  - 4.3 In the `sendResetPassword` method generate a new jwt with the email value as a payload :
+  ```js
+  const resetToken = jwt.sign({user: email}, process.env.JWT_AUTH_SECRET);
+  ```
+
+  - 4.4 After generating the resetToken create a const `url` with the following structure :
+  ```js
+  const url = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
+  ```
+
+  - 4.5 Finally, call the `sendResetPasswordMail` passing it as a parameters the following : 
+  ```js
+  await sendResetPasswordMail({email, url});
+  ```
+
+  - 4.6 If no error occured just send a response with 200 http status (dont forget to catch the error), and dont forget to export your method for link to your route in the index.js file of the users module.
+
+5. Add a new post route `/resetPassword` in your module users :
+
+  - 5.1 Create a `resetPassword` method in your controller :
+  ```js
+  const resetPassword = (req, res, next) => {
+    const {token, password} = req.body;
+  }
+  ```
+
+  - 5.2 decode the token for getting the user email in the payload
+
+  - 5.4 If the token is valid :
+    - 5.4.1 generate a hash of the password with argon
+    - 5.4.2 call a update method from your model for updating the password of the user
 
 
 # Front
 
-## 1 - Add a form to manage the upload on the Home page
+## 1 - Add a forgotPassword link and page
 
-1. In your `Home.jsx` component, add an html form including a file-type input and a submit-type button, linked the value of the file input to a constant `file` by calling the `useRef` hook and the ref property in your input
+  - 1 In the `Login.jsx` page add a link `reset my password` for redirect to a `/forgotPassword` route
 
-2. Add a `handleSubmit` method that will be called when the form is submitted
+  - 2 create a page component `ForgotPassword` that include a form with a email input and submit button
 
-3. In your `handleSubmit` method create a `form` constant which takes in value an instance of the formData class (this class exists by default no need to import it)
+  - 3 Add a handleSubmit method for calling the post route `sendResetPassword` with axios
 
-4. Call the append method from your `form` constant to add your `file.current.files[0]` constant to your formData with the key "avatar" ( !warning: avatar is the name that we expect to get in our api !)
+## 2 - Create the `/resetPassword/:token` route with the associated page component
 
-5. Make a post request via axios on the "/users/updateAvatar" route by passing our `form` constant as a parameter (ideally declare the method in your service!)
+  - 1 Create a page component `ResetPassword` that include a form with a password input and a submit button
+
+  - 2 Get the token in the url with `useParams` hook : https://reactrouter.com/en/main/hooks/use-params
+
+  - 3 Add a handleSubmit method for calling the post route `resetPassword` with axios
+
+  - 4 If no error occured, redirect to the login page.

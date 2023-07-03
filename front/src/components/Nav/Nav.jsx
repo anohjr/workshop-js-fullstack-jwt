@@ -10,10 +10,13 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
-        await logout();
-        setAuth({user: null, isLogged: false});
-        navigate("/login");
+        try {
+            await logout();
+            setAuth({user: null, isLogged: false});
+            navigate("/login");
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (

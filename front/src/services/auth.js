@@ -1,10 +1,10 @@
 import api from "./api";
 
-const login = (email, password) => {
+const login = async (email, password) => {
     return api.post("/users/login", {email, password});
 }
 
-const logout = () => {
+const logout = async () => {
     return api.get("/users/logout");
 }
 
