@@ -127,12 +127,12 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
 
   - 4.4 After generating the resetToken create a const `url` with the following structure :
   ```js
-  const url = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
+  const url = `${process.env.FRONTEND_URL}/resetPassword?token=${resetToken}`;
   ```
 
   - 4.5 Finally, call the `sendResetPasswordMail` passing it as a parameters the following : 
   ```js
-  await sendResetPasswordMail({email, url});
+  await sendResetPasswordMail({dest: email, url});
   ```
 
   - 4.6 If no error occured just send a response with 200 http status (dont forget to catch the error), and dont forget to export your method for link to your route in the index.js file of the users module.
@@ -167,7 +167,7 @@ NB : the secure key must be setting up to false for 587 PORT, and true for 465 P
 
   - 1 Create a page component `ResetPassword` that include a form with a password input and a submit button
 
-  - 2 Get the token in the url with `useParams` hook : https://reactrouter.com/en/main/hooks/use-params
+  - 2 Get the token in the url with `useSearchParams` hook : https://reactrouter.com/en/main/hooks/use-search-params
 
   - 3 Add a handleSubmit method for calling the post route `resetPassword` with axios
 
