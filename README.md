@@ -1,5 +1,5 @@
 
-# Workshop file upload : Express/React Multer
+# Workshop send mail : Express/React nodemailer
 
 ### Install dependencies
 Install the dependencies project with the command:
