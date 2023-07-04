@@ -1,12 +1,14 @@
 import useStore from "../store";
 import { useEffect, useRef, useState } from "react";
 import { updateAvatar } from "../services/users";
+import {useSelector} from "react-redux";
 
 function Home() {
 
-    const {auth} = useStore();
     const file = useRef();
     const [avatar, setAvatar] = useState(null);
+
+    const auth = useSelector((state) => state.auth);
 
     useEffect(() => {
         setAvatar(auth.user.avatar);

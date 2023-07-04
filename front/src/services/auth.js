@@ -17,3 +17,4 @@ const resetPassword = async (password, token) => {
 }
 
 export {login, logout, sendResetPassword, resetPassword};
+export default {login, logout, sendResetPassword, resetPassword};

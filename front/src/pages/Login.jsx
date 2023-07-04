@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Input from "../components/Input";
-import { login } from "../services/auth";
+import authService from "../services/auth";
 import { useNavigate } from "react-router-dom";
-import useStore from "../store";
+import {useDispatch} from "react-redux";
+import { login } from "../store/auth";
 
 function Login() {
 
@@ -12,14 +13,14 @@ function Login() {
 
     const navigate = useNavigate();
 
-    const {auth, setAuth} = useStore();
+    const dispatch = useDispatch();
     
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const result = await login(email, password);
-            setAuth({user: result.data, isLogged: true});
+            const result = await authService.login(email, password);
+            dispatch(login(result.data));
             navigate("/");
         } catch (error) {
             if (error.response.status == 400)

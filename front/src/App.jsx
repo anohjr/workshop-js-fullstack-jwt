@@ -3,11 +3,30 @@ import Users from "./pages/Users";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Nav from "./components/Nav/Nav";
-import useStore from "./store";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import {useSelector, useDispatch} from "react-redux";
+import { useEffect } from "react";
+import { login } from "./store/auth";
+import { getCurrentUser } from "./services/users";
 
 function App() {
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    reloadStore();
+  }, []);
+
+  const reloadStore = async () => {
+    try {
+      const result = await getCurrentUser();
+      dispatch(login(result.data));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return (
     <Router>
       <div className='app'>
@@ -30,7 +49,7 @@ const roles = [
 ];
 
 const PrivateRoute = ({children, role = "ROLE_USER"}) => {
-  const {auth} = useStore();
+  const auth = useSelector((state) => state.auth);
   if (auth.isLogged) {
     if (auth.user?.role == role || roles.indexOf(auth.user?.role) >= roles.indexOf(role))
       return children;
@@ -42,7 +61,7 @@ const PrivateRoute = ({children, role = "ROLE_USER"}) => {
 }
 
 const PublicRoute = ({children}) => {
-  const {auth} = useStore();
+  const auth = useSelector((state) => state.auth);
   if (!auth.isLogged) {
     return children;
   }
